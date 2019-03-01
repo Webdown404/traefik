@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    image: traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    command: --api --docker --docker.network=traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+networks:
+    default:
+        external:
+            name: traefik
