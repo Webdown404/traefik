@@ -6,9 +6,9 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
-    command: --api --docker --docker.network=traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/etc/traefik/traefik.toml
     restart: unless-stopped
 
 networks:
