@@ -1,14 +1,15 @@
-version: '3'
+version: '3.7'
 
 services:
   reverse-proxy:
-    image: traefik
+    build:
+      context: .
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.toml:/etc/traefik/traefik.toml
     restart: unless-stopped
 
 networks:

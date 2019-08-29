@@ -14,7 +14,13 @@ Add label to link backend service to traefik frontend
 services:
     webserver:
         labels:
-            - "traefik.frontend.rule=Host:www.myproject.local"
+            traefik.enable: true
+            traefik.http.routers.www-myproject.entrypoints: http
+            traefik.http.routers.www-myproject.rule: Host(`www.myproject.local`)
+            traefik.http.routers.secure-www-myproject.entrypoints: https
+            traefik.http.routers.secure-www-myproject.rule: Host(`www.myproject.local`)
+            traefik.http.routers.secure-www-myproject.tls: true
+            traefik.http.services.secure-www-myproject.loadbalancer.server.port: 80
 ```
 
 Add DNS resolution to your localhost
