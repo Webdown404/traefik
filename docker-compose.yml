@@ -3,16 +3,29 @@ version: '3.7'
 services:
   reverse-proxy:
     build:
-      context: .
+      context: reverse-proxy
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-certificats:/var/ssl/
+      - ./reverse-proxy/conf.d:/etc/traefik/conf.d/
     restart: unless-stopped
 
+  certificat-generator:
+    build:
+      context: certificat-generator
+    volumes:
+      - traefik-certificats:/var/ssl/
+
+volumes:
+  traefik-certificats:
+    external: true
+    name: traefik-certificats
+
 networks:
-    default:
-        external:
-            name: traefik
+  default:
+      external:
+          name: traefik

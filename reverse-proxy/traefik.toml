@@ -1,0 +1,22 @@
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+  [entryPoints.https]
+    address = ":443"
+
+[providers]
+  [providers.docker]
+    endpoint = "unix:///var/run/docker.sock"
+    watch = true
+    exposedByDefault = false
+    usebindportip = true
+    network = "traefik"
+  [providers.file]
+    directory = "/etc/traefik/conf.d"
+    watch = true
+
+[api]
+  insecure = true
+
+[log]
+  level = "WARNING"

@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  certificat-generator:
+    environment:
+      domains: www.myproject
+    volumes:
+      - /usr/local/share/ca-certificates/docker:/root/.local/share/mkcert
