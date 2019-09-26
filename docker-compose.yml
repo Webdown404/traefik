@@ -10,22 +10,21 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - traefik-certificats:/var/ssl/
+      - traefik-certificates:/var/ssl/
       - ./reverse-proxy/conf.d:/etc/traefik/conf.d/
     restart: unless-stopped
 
-  certificat-generator:
+  certificate-generator:
     build:
-      context: certificat-generator
+      context: certificate-generator
     volumes:
-      - traefik-certificats:/var/ssl/
+      - traefik-certificates:/var/ssl/
 
 volumes:
-  traefik-certificats:
+  traefik-certificates:
     external: true
-    name: traefik-certificats
 
 networks:
   default:
-      external:
-          name: traefik
+    external:
+      name: traefik

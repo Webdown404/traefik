@@ -1,43 +1,46 @@
 # Traefik
 
-A reverse proxy for local web development with docker-compose
+A reverse proxy for local web development with Docker Compose.
 
 ## Traefik Installation
 
-Clone repo
+Clone the repository:
 
 ```console
-> git clone git@github.com:Webdown404/traefik.git traefik
+> git clone git@github.com:Webdown404/traefik.git
 > cd traefik
 ```
 
-Create external docker network to link docker services with traefik
+Create external Docker network to link other Docker Compose services with Traefik:
 
 ```console
 > docker network create traefik
 ```
 
-Create external docker volume to store certificats
+Create external Docker volume to store certificates:
 
 ```console
-> docker volume create traefik-certificats
+> docker volume create traefik-certificates
 ```
 
-Start traefik
+Copy `docker-compose.override.yml.dist` to `docker-compose.override.yml` and tweak it to your needs; then start Traefik:
 
 ```console
 > docker-compose up -d
 ```
 
-You can check traefik dashboard to [localhost:8080](localhost:8080)
+You can check Traefik dashboard at [localhost:8080](http://localhost:8080).
 
-## Configure a local docker-compose service to use traefik
+## Configure a local Docker Compose service to use Traefik
 
-Traefik will configure routers and services by listening docker api. You have to add labels in your webserver service to create a new `www-myproject` http router with Traefik
+Traefik will configure routers and services by listening Docker API. You need to:
+ - declare the external `traefik` network;
+ - link the webserver to the network;
+ - add labels to your webserver to create a new named (e.g. `www-myproject`) HTTP router with Traefik.
 
 ```yaml
 services:
-    [...]
+    # ...
     webserver:
         labels:
             traefik.enable: true
@@ -46,93 +49,91 @@ services:
         network:
             - default
             - traefik
+
+networks:
+    traefik:
+        external: true
 ```
 
-Add DNS resolution to your localhost
+Add DNS resolution to your localhost:
 
 ```console
-> echo "127.0.0.1 www.myproject.local" >> /etc/hosts
+> echo "127.0.0.1 www.myproject.local" | sudo tee -a /etc/hosts
 ```
 
-You application is now available to [http://www.myproject.local](http://www.myproject.local)
+You application is now available at [http://www.myproject.local](http://www.myproject.local).
 
-## Enable SSL with the default self signed Traefik certificat
+## HTTPS
 
-To configure traefik in order to use the defaut traefik self signed certificat, you have to configure a new dedicated `secure-www-myproject` https router in your webserver service of your project as follow
+To make your webserver available through HTTPS, add dedicated (e.g. `secure-www-myproject`) routing labels to the webserver service of your project as follows:
 
 ```yaml
 services:
-    [...]
+    # ...
     webserver:
         labels:
             traefik.enable: true
-            [...] # http traefik configuration labels
+            # ...
             traefik.http.routers.secure-www-myproject.entrypoints: https
             traefik.http.routers.secure-www-myproject.rule: Host(`www.myproject.local`)
             traefik.http.routers.secure-www-myproject.tls: true
-        network:
-            - default
-            - traefik
 ```
 
-You application is now available to [https://www.myproject.local](https://www.myproject.local)
+You application is now available at [https://www.myproject.local](https://www.myproject.local).
 
-> **Note** : This configuration use a self signed certificat. That's why you will see a CA security alert.
+> **Note**: This configuration uses a self-signed certificate. That's why you will see a CA security alert.
 
-## Enable SSL with a CA validated mkcert certificat 
+## Trusted Certificates
 
-To avoid CA security alerts you can use mkcert to generate certificates validated by the mkcert CA.
+To avoid CA security alerts you can use mkcert to generate trusted certificates.
 
-### Generate Certificat
+### Generate Certificates
 
-Override this docker-compose configuration with a `docker-compose.override.yml` by configuring the `domains` environment variable  to the `certificat-generator` service as follow
+Make sure the `domains` environment variable in `docker-compose.override.yml` lists all the domains you need:
 
 ```yaml
-version: '3.7'
-
 services:
-    certificat-generator:
+    certificate-generator:
         environment:
-            domains: 'www.myproject.local'
+            DOMAINS: 'www.myproject.local'
 ```
 
-> **Note** : 
-> - You can generate multiple certificats with a comma separator (e.g. `domains: 'www.myproject.local,www.otherproject.local'`)
-> - You can generate wildcard certificat like this `*.myproject.local`
+> **Note**: 
+> - You can generate multiple certificates with a comma separator (e.g. `DOMAINS: 'www.myproject.local,www.otherproject.local'`)
+> - You can generate wildcard certificates, e.g.: `*.myproject.local`
 
-Generate your certificate
+Generate the certificates:
 
 ```console
-> docker-compose run certificat-generator
+> docker-compose run --rm certificate-generator
 ```
 
-### Configure Traefik to use the mkcert generated certificat
+### Configure Traefik to use the generated certificates
 
-To configure Traefik to use your mkcert generated certificat you have to create a `config.yaml` configuration file into `./reverse-proxy/conf.d/config.yaml`. In the file you have to add your certificate as follow :
+To configure Traefik to use the generated certificates you have to create a `config.yaml` configuration file in `./reverse-proxy/conf.d/config.yaml` and configure the generated certificates as follows:
 
 ```yaml
 tls:
   certificates:
     - certFile: "/var/ssl/www.myproject.local.pem"
       keyFile: "/var/ssl/www.myproject.local-key.pem"
+    - # ...
 ```
 
-### Add mkcert CA to your browser
+> **Note**: don't forget to restart Traefik with `docker-compose up -d`
 
-The `certificat-generator` service will generate a `rootCA.pem` into `/root/.local/share/mkcert` that you have to add to your browser in order to validate mkcert certificat. This file is generated into the `certificat-generator` service but not in your host.
+### Make your system trust mkcert certificates
 
-To give `rootCA.pem` access to your host you can mount a volume between your host and the `certificat-generator` service by editing the `docker-compose.override.yml` file as follow
+mkcert works by creating a root CA which is used to sign the certificates it generates. As your system does not know about this root CA, it won't trust any generated certificates. This is why you need to have a volume in `docker-compose.override.yml`: it allows retrieving the mkcert root CA onto your system so you can trust it.
 
-```yaml
-services:
-    certificat-generator:
-        [...]
-        volumes:
-            - /usr/local/share/ca-certificates/docker:/root/.local/share/mkcert
+On Linux, this is done by running the following command:
+
+```console
+> sudo update-ca-certificates
 ```
 
-> **Note** : Don't forget to restart your docker-compose project to update your configuration with `docker-compose up -d`
+on macOS, you need to open the .crt file via the file manager and follow instructions.
 
-Now your `rootCA.pem` is available into `/usr/local/share/ca-certificates/docker/rootCA.pem`. You just have to add this file to your browser :
-- for google chrome : [https://support.google.com/chrome/a/answer/6342302?hl=en](https://support.google.com/chrome/a/answer/6342302?hl=en)
-- for firefox : [https://support.mozilla.org/en-US/kb/setting-certificate-authorities-firefox](https://support.mozilla.org/en-US/kb/setting-certificate-authorities-firefox)
+Most browsers use their own root CA system so you need to update yours as well:
+- for Google Chrome: [https://support.google.com/chrome/a/answer/6342302](https://support.google.com/chrome/a/answer/6342302)
+- for Mozilla Firefox: [https://support.mozilla.org/en-US/kb/setting-certificate-authorities-firefox](https://support.mozilla.org/kb/setting-certificate-authorities-firefox)
