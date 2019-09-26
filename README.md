@@ -98,7 +98,7 @@ services:
             DOMAINS: 'www.myproject.local'
 ```
 
-> **Note**: 
+> **Note**:
 > - You can generate multiple certificates with a comma separator (e.g. `DOMAINS: 'www.myproject.local,www.otherproject.local'`)
 > - You can generate wildcard certificates, e.g.: `*.myproject.local`
 
