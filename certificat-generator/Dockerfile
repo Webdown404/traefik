@@ -6,4 +6,4 @@ RUN curl --location --output /usr/local/bin/mkcert https://github.com/FiloSottil
 
 WORKDIR /var/ssl
 
-CMD mkcert -install && for i in $(echo $domains | sed "s/,/ /g"); do mkcert ${i}; done
+CMD mkcert -install && for i in $(echo $DOMAINS | sed "s/,/ /g"); do mkcert ${i}; done
