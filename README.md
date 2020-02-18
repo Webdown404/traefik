@@ -85,11 +85,11 @@ You application is now available at [https://www.myproject.local](https://www.my
 
 ## Trusted Certificates
 
-To avoid CA security alerts you can use mkcert to generate trusted certificates.
+To allow HTTPS, this project uses [mkcert](https://github.com/FiloSottile/mkcert) to generate trusted self-signed SSL certificates.
 
 ### Generate Certificates
 
-Make sure the `domains` environment variable in `docker-compose.override.yml` lists all the domains you need:
+Make sure the `DOMAINS` environment variable in `docker-compose.override.yml` lists all the domains you need:
 
 ```yaml
 services:
@@ -99,7 +99,7 @@ services:
 ```
 
 > **Note**:
-> - You can generate multiple certificates with a comma separator (e.g. `DOMAINS: 'www.myproject.local,www.otherproject.local'`)
+> - You can generate multiple certificates with a space separator (e.g. `DOMAINS: 'www.myproject.local www.otherproject.local'`)
 > - You can generate wildcard certificates, e.g.: `*.myproject.local`
 
 Generate the certificates:
@@ -107,20 +107,6 @@ Generate the certificates:
 ```console
 > docker-compose run --rm certificate-generator
 ```
-
-### Configure Traefik to use the generated certificates
-
-To configure Traefik to use the generated certificates you have to create a `config.yaml` configuration file in `./reverse-proxy/conf.d/config.yaml` and configure the generated certificates as follows:
-
-```yaml
-tls:
-  certificates:
-    - certFile: "/var/ssl/www.myproject.local.pem"
-      keyFile: "/var/ssl/www.myproject.local-key.pem"
-    - # ...
-```
-
-> **Note**: don't forget to restart Traefik with `docker-compose up -d`
 
 ### Make your system trust mkcert certificates
 
