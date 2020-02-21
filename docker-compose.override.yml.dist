@@ -8,4 +8,4 @@ services:
     volumes:
       # Make the root CA created by mkcert available on your host system.
       # On Linux, the source path should be known to the `update-ca-certificates` command.
-      - /usr/local/share/ca-certificates/docker:/root/.local/share/mkcert
+      - /usr/local/share/ca-certificates/docker:/host/ca-certificates

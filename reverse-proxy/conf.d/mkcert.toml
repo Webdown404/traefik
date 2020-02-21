@@ -1,0 +1,3 @@
+[[tls.certificates]]
+  certFile = "/var/ssl/mkcert.pem"
+  keyFile = "/var/ssl/mkcert-key.pem"

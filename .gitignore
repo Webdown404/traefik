@@ -1,3 +1,1 @@
 /docker-compose.override.yml
-/reverse-proxy/conf.d/*
-!/reverse-proxy/conf.d/.gitkeep
