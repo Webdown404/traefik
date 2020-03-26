@@ -4,7 +4,7 @@ services:
   certificate-generator:
     environment:
       # List of domains to generate certificates for, separated by commas.
-      DOMAINS: www.myproject
+      HTTPS_DOMAINS: www.myproject
     volumes:
       # Make the root CA created by mkcert available on your host system.
       # On Linux, the source path should be known to the `update-ca-certificates` command.
