@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -21,7 +21,7 @@ else
     cp "$container_root_ca_key" "$host_root_ca_key"
 fi
 
-if [[ "$HTTPS_DOMAINS" != '' ]]
+if [ "$HTTPS_DOMAINS" != '' ]
 then
     mkdir -p /var/ssl
     echo "$HTTPS_DOMAINS" | xargs mkcert --cert-file /var/ssl/mkcert.pem --key-file /var/ssl/mkcert-key.pem
