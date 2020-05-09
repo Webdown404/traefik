@@ -1,0 +1,22 @@
+name: Continuous Integration checks
+
+on: push
+
+jobs:
+  continuous-integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@master
+      
+    - name: Docker Build
+      run: |
+        docker-compose build
+
+    - name: Docker Up
+      run: |
+        docker network create traefik
+        docker volume create traefik-certificates
+        docker-compose up -d
