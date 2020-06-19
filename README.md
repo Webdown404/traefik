@@ -46,7 +46,7 @@ services:
             traefik.enable: true
             traefik.http.routers.www-myproject.entrypoints: http
             traefik.http.routers.www-myproject.rule: Host(`www.myproject.local`)
-        network:
+        networks:
             - default
             - traefik
 
