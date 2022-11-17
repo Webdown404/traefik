@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 
 services:
   reverse-proxy:
@@ -19,12 +19,15 @@ services:
       context: certificate-generator
     volumes:
       - traefik-certificates:/var/ssl/
+      - traefik-ca-certificates:/host/ca-certificates
 
 volumes:
   traefik-certificates:
     external: true
+  traefik-ca-certificates:
+    external: true
 
 networks:
   default:
-    external:
-      name: traefik
+    external: true
+    name: traefik

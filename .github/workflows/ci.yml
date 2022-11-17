@@ -19,4 +19,5 @@ jobs:
       run: |
         docker network create traefik
         docker volume create traefik-certificates
+        docker volume create traefik-ca-certificates
         docker-compose up -d

@@ -1,0 +1,11 @@
+version: 3
+
+tasks:
+    open-dashboard:
+      cmds:
+        - xdg-open http://localhost:8080
+  
+    install-ca-certificate:
+      cmds:
+        - docker-compose run --rm certificate-generator cat /host/ca-certificates/mkcert-traefik.crt > /usr/local/share/ca-certificates/mkcert-traefik.crt
+        - sudo update-ca-certificate

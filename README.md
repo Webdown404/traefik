@@ -2,6 +2,12 @@
 
 A reverse proxy for local web development with Docker Compose.
 
+## Requirements
+
+This stack require :
+- `docker` and `docker-compose` ([https://github.com/docker](https://github.com/docker))
+- `task` ([https://github.com/go-task/task](https://github.com/go-task/task))
+
 ## Traefik Installation
 
 Clone the repository:
@@ -11,25 +17,23 @@ Clone the repository:
 > cd traefik
 ```
 
-Create external Docker network to link other Docker Compose services with Traefik:
+Create external Docker network to link other Docker Compose services with Traefik and create external Docker volume to store certificates:
 
 ```console
-> docker network create traefik
-```
-
-Create external Docker volume to store certificates:
-
-```console
-> docker volume create traefik-certificates
+> task setup
 ```
 
 Copy `docker-compose.override.yml.dist` to `docker-compose.override.yml` and tweak it to your needs; then start Traefik:
 
 ```console
-> docker-compose up -d
+> task start
 ```
 
-You can check Traefik dashboard at [localhost:8080](http://localhost:8080).
+You can check Traefik dashboard at [localhost:8080](http://localhost:8080) or with Taskfile with:
+
+```console
+> task open-dashboard
+```
 
 ## Configure a local Docker Compose service to use Traefik
 
@@ -105,21 +109,13 @@ services:
 Generate the certificates:
 
 ```console
-> docker-compose run --rm certificate-generator
+> task generate-certificate
 ```
 
 ### Make your system trust mkcert certificates
 
-mkcert works by creating a root CA which is used to sign the certificates it generates. As your system does not know about this root CA, it won't trust any generated certificates. This is why you need to have a volume in `docker-compose.override.yml`: it allows retrieving the mkcert root CA onto your system so you can trust it.
-
-On Linux, this is done by running the following command:
+In order to trust mkcert CA, you have to add generated CA certificate to your system:
 
 ```console
-> sudo update-ca-certificates
+> task install-ca-certificate
 ```
-
-on macOS, you need to open the .crt file via the file manager and follow instructions.
-
-Most browsers use their own root CA system so you need to update yours as well:
-- for Google Chrome: [https://support.google.com/chrome/a/answer/6342302](https://support.google.com/chrome/a/answer/6342302)
-- for Mozilla Firefox: [https://support.mozilla.org/en-US/kb/setting-certificate-authorities-firefox](https://support.mozilla.org/kb/setting-certificate-authorities-firefox)

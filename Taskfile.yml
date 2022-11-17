@@ -1,0 +1,39 @@
+version: 3
+
+includes:
+   os-specific: 
+    taskfile: ./Taskfile_{{OS}}.yml
+    internal: true
+
+tasks:
+    setup:
+      desc: 'Setup Docker volumes and network'
+      cmds:
+        - docker network create traefik
+        - docker volume create traefik-certificates
+        - docker volume create traefik-ca-certificates
+    
+    start:
+      desc: 'Start Traefik stack'
+      cmds:
+        - docker-compose up -d
+
+    stop:
+      desc: 'Stop Traefik stack'
+      cmds:
+        - docker-compose down
+    
+    open-dashboard:
+      desc: 'Open Traefik dashboard on browser'
+      cmds:
+        - task: os-specific:open-dashboard
+
+    install-ca-certificate:
+      desc: 'Install mkcert CA certificate to host'
+      cmds:
+        - task: os-specific:install-ca-certificate
+
+    generate-certificate:
+      desc: 'Generate mkcert CA certificate'
+      cmds:
+        - docker-compose run --rm certificate-generator
