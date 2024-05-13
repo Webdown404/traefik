@@ -1,3 +1,3 @@
-FROM traefik:2.9
+FROM traefik:3.0
 
 COPY ./traefik.toml /etc/traefik/traefik.toml

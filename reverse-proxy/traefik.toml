@@ -19,4 +19,4 @@
   insecure = true
 
 [log]
-  level = "WARNING"
+  level = "WARN"
