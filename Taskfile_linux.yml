@@ -7,5 +7,5 @@ tasks:
   
     install-ca-certificate:
       cmds:
-        - docker-compose run --rm certificate-generator cat /host/ca-certificates/mkcert-traefik.crt > /usr/local/share/ca-certificates/mkcert-traefik.crt
+        - docker compose run --rm certificate-generator cat /host/ca-certificates/mkcert-traefik.crt > /usr/local/share/ca-certificates/mkcert-traefik.crt
         - sudo update-ca-certificate
